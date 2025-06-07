@@ -4,10 +4,10 @@
 
 - This project of writing tic-tac-toe game was set out by Chang-Jin Lee in 2025.
 
-- The main contents comes from the source codes of Tic-Tac-Toe Project publicized by Harvard on-line Machine Learning course CS50 AI.
-I modified many lines of the old-fashioned style codes into the class-based pythonic style codes.
+- The main source codes comes from the Tic-Tac-Toe Project given by Harvard on-line Machine Learning course CS50 AI.
+I modified the codes into the class-based object-oriented-style codes.
 
-- The main structure comes from the booK "Python Crash Course, by Eric Mathes, 2nd Ed. no stark press (2019)".
+- The main structure of the modified codes comes from the booK "Python Crash Course, by Eric Mathes, 2nd Ed. no stark press (2019)".
 
 Tasks for some improvements.
     1. At present, the strategy of AI minimax algorithm is just a random choice. 
