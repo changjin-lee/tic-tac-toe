@@ -5,7 +5,7 @@
 # reference: 
 #   - Python Crash Course, Eric Matthes, 2nd Ed., no starch press (2019)
 #   - Project source files from Havard on-line Machine Learning course of CS50 AI, 1st lecture.
-#     Modified into a object-oriented codes.
+#     Modified into an object-oriented style codes.
 
 import sys, time, pygame
 
@@ -13,12 +13,11 @@ from settings import Settings
 from player import Player
 from board import Board
 from tiles import Tiles
+# Import Models package that includes various strategies for AI to find the optimal action.
+from models import *
 
 class TicTacToe:
     """Overall class to manage game assets and behavior."""
-    
-    # # Create an instance of the Board class, and set it as a class variable
-    # board = Board()
 
     def __init__(self):
         """initialize the game, and create game resorces"""
@@ -35,7 +34,7 @@ class TicTacToe:
         self.ai = Player() # agent=None, on_turn=False   
         # user can choose an agent from "O" or "X": Set as ai.agent = None as default value
         # Set as user.on_turn = False and ai.on_turn = False: 
-        # user makes the first move, then AI takes the next.
+        # user makes the first move, then AI takes the second.
         
         # Create a game board: an instance of the Board class.
         self.board = Board()
@@ -69,18 +68,21 @@ class TicTacToe:
                 self.board.update(self.board.state)
                 self.tiles.update(self.board)
                  
-                # Check which place the user moves to, and apply user's move to the state of the board.
+                # Check if the game is over. 
+                # if negative, check which place the user moves to, and apply user's move to the state of the board.
                 self.check_winner()
                 self.put_user_on_notice()
                 self.check_user_move()
                 
-                # Check if the game is over, otherwise AI is the next mover. Then, calculate the best move for AI. 
-                # Use a minimax algorithm for the optimal action for AI.     
+                # Check if the game is over, 
+                # If negative, AI is the next mover. Then, calculate the best move for AI. 
+                # Select a model for AI to find the optimal action for its move.     
                 if self.ai.on_turn and not self.user.on_turn:
                     # Check the winner and display which player is going to move.
                     self.check_winner()
                     self.put_user_on_notice()
                     # AI moves when the game is not over.
+                    # AI can select a model to find the optimal action: 1. Random, 2. Axiomatic, 3. Mathematical, 4. Machine Learning.
                     self.make_ai_move()
                             
             elif self.board.game_over:  
@@ -258,8 +260,10 @@ class TicTacToe:
                     sys.exit()
         # Calculate the optimal action for AI
         if self.ai.on_turn and not self.user.on_turn and not self.board.game_over:
+            # Determine which model is to be used for AI.
+            model = ModelRandom(self.board)
             # Calculate the optimal action for AI
-            self.ai.action_optimal = self.minimax() 
+            self.ai.action_optimal = model.minimax() 
             # time.sleep(0.5)
             # ai.action_optimal is the optimal action for ai to take.
             self.board.state = self.ai.apply_action_optimal(self.board, self.ai.action_optimal, self.ai.agent) 
@@ -315,42 +319,6 @@ class TicTacToe:
                     # print("Play Again button clicked!")
                     self.reset()
 
-                    # Erase the screen.
-                    # self.screen.fill(self.settings.bg_color)        
-    
-    # AI model: minmax algorithm.
-    def minimax(self):
-        """
-        Returns the optimal action for the current player, AI_Agent, on the board.
-        """
-        # We need know which is the ai.agent, X or O.
-        # if ai.agent = 1, or if ai.agent_str = "X", we maximize the score as high as possible.
-        # if ai.agent = -1, or if ai.agent_str = "O", the opposite: minimize the score.
-        
-        # Execute quantify_state(board) to get matrix, counter_filled, sum_list from quantify_state(board)
-        # Find the number of tiles filled on board: counter_filled from quantify_state(board)
-        #
-        # -----------------
-        # Random Strategy: 
-        # -----------------
-        #   choose any empty tile at random:
-        #   make a list including the tuples of (i, j) for the empty tiles.
-        #   make a rondom choice of a tuple out of the list.
-        #   return it as the ai_move in runner.py
-        import random
-        
-        matrix = self.board.state
-        tiles_empty = []
-        
-        for i, row in enumerate(matrix):
-            for j, col in enumerate(row):
-                if col == 0:
-                    tiles_empty.append((i, j))
-        
-        ai_move = random.choice(tiles_empty)
-        return ai_move
-        # return (2,2)
-            
             
 # Main starts here!            
 if __name__ == '__main__':

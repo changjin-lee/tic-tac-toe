@@ -1,1 +1,4 @@
-minimax.py
+# Ignore the ttt folder
+ttt/
+# Ignore README.md files
+*.md
