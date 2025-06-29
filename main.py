@@ -7,14 +7,29 @@
 #   - Project source files from Havard on-line Machine Learning course of CS50 AI, 1st lecture.
 #     Modified into an object-oriented style codes.
 
-import sys, time, pygame
+import sys, os
 
+main_dir = os.path.abspath(os.path.dirname(__file__))
+# main_dir = os.path.abspath(".")
+sys.path.append(main_dir)
+models_path = os.path.join(main_dir, 'models')
+sys.path.append(models_path)
+fonts_path = os.path.join(main_dir, 'fonts')
+sys.path.append(fonts_path)
+
+import time, pygame
+
+# Import settings and classes from src folder.
+# from ttt import *
 from settings import Settings
 from player import Player
 from board import Board
 from tiles import Tiles
-# Import Models package that includes various strategies for AI to find the optimal action.
+
+# Import the models package from src.models folder.
+# which includes various strategies for AI to find the optimal action.
 from models import *
+# from src.models.model_random import ModelRandom
 
 class TicTacToe:
     """Overall class to manage game assets and behavior."""
@@ -73,19 +88,19 @@ class TicTacToe:
                 self.check_winner()
                 self.put_user_on_notice()
                 self.check_user_move()
-                
+                                    
                 # Check if the game is over, 
                 # If negative, AI is the next mover. Then, calculate the best move for AI. 
                 # Select a model for AI to find the optimal action for its move.     
                 if self.ai.on_turn and not self.user.on_turn:
+                    # AI moves when the game is not over.
+                    # AI can select a model to find the optimal action: 1. Random, 2. Axiomatic, 3. Mathematical, 4. Machine Learning.
                     # Check the winner and display which player is going to move.
                     self.check_winner()
                     self.put_user_on_notice()
-                    # AI moves when the game is not over.
-                    # AI can select a model to find the optimal action: 1. Random, 2. Axiomatic, 3. Mathematical, 4. Machine Learning.
                     self.make_ai_move()
                             
-            elif self.board.game_over:  
+            elif self.user.agent != None and self.board.game_over:  
                 # Check if the user want to replay.
                 self.check_replay()
                 
@@ -184,8 +199,8 @@ class TicTacToe:
 
     def put_user_on_notice(self):
         # Show the status of the current game on the screen.
-        # 3 status: on play as X or O, otherwise the game is over.      
-        # put user on notice
+        # 4 status: play as X, play as O, AI is thinking..., otherwise the game is over.      
+        # put user on notice: AI is thinking...
         # Determine which sentence to be shown on the board.
         if self.board.game_over:
             if self.winner is None:
@@ -194,7 +209,8 @@ class TicTacToe:
                 title = f"Game Over: {self.winner} wins."
         elif self.user.on_turn:
             title = f"Play as {self.user.agent_str}"
-        elif self.ai.on_turn:
+        # elif self.ai.on_turn:
+        else:
             title = f"Computer thinking..."
         # Secondly, Show the title on the screen.    
         title_mid = self.settings.Font_Large.render(title, True, self.settings.obj_color)
@@ -261,9 +277,9 @@ class TicTacToe:
         # Calculate the optimal action for AI
         if self.ai.on_turn and not self.user.on_turn and not self.board.game_over:
             # Determine which model is to be used for AI.
-            model = ModelRandom(self.board)
+            model = ModelRandom(self.board.state, self.user.agent) # attr self.board.state = list, self.user.agent = 1 or -1.
             # Calculate the optimal action for AI
-            self.ai.action_optimal = model.minimax() 
+            self.ai.action_optimal = model.minimax()
             # time.sleep(0.5)
             # ai.action_optimal is the optimal action for ai to take.
             self.board.state = self.ai.apply_action_optimal(self.board, self.ai.action_optimal, self.ai.agent) 

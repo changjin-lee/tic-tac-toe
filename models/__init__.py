@@ -7,7 +7,9 @@
 # 3. Mathematical calculation of the probability for AI to win.
 # 4. Machine Learning
 
-__all__ = ["ModelRandom", "ModelAxiomatic"]
+__all__ = ["ModelRandom", "SimpleRandom", "MonteCarlo", "MCBoard", "ModelAxiomatic"]
 
-from .random import *
+from .simple_random import *
+from .model_random import *
+from .mc_board import *
 from .axiomatic import *

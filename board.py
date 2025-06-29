@@ -18,6 +18,11 @@ class Board:
         self.count_filled = 0 # Create instance variables # integers in range(10)
         self.sum_list = [] # sum_list: includes sums of each row, column and diagonal.
         self.game_over = False 
+        self.game_tie = False # 0 emans tie
+        # Create a dict to save the game_record: {(1,1): 1 or -1, (0, 0): 1 or -1, ...}.
+        self.game_record = {} 
+        # Create a flag to check which tile is recent one. Set the unoccupied tiles as False.
+        self.occupied = [[False, False, False], [False, False, False], [False, False, False]]
 
     def convert_to_str(self, state_num):
         # Converts the elements of the state from integers to strings. 
@@ -43,6 +48,10 @@ class Board:
                 self.state[i][j] = element # Update the value at (i, j) on board
                 if element in (self.settings.O, self.settings.X):
                     new_count_filled += 1
+                    # Write the newly added move in self.game_record.
+                    if not self.occupied[i][j]:
+                        self.game_record[(i,j)] = element
+                        self.occupied[i][j] = True
         self.count_filled = new_count_filled
         
         # Update the state_str
@@ -73,8 +82,10 @@ class Board:
             self.game_over = False
         elif self.count_filled == 9:
             self.game_over = True
+            if (3 not in self.sum_list) and (-3 not in self.sum_list):
+                self.game_tie = True
         elif self.count_filled >= 5:
-            if -3 in self.sum_list or 3 in self.sum_list:
+            if (3 in self.sum_list) or (-3 in self.sum_list):
                 self.game_over = True
             else:
                 self.game_over = False

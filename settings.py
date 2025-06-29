@@ -1,10 +1,11 @@
 # settings.py for Tic-Tac-Toe Game!
 
-import sys, os
+# import sys, os
 
-# # Includes the fonts folder in the list of sys.path.
-fonts_path = os.path.join(os.getcwd(), 'fonts')
-sys.path.append(fonts_path)
+# current_dir = os.path.dirname(__file__)
+# parent_dir = os.path.dirname(current_dir)
+# fonts_path = os.path.join(parent_dir, 'fonts')
+# sys.path.append(fonts_path)
 
 import pygame
 
@@ -48,5 +49,4 @@ class Settings:
 if __name__ == '__main__':
     test = Settings()
     print(test.initial_archive)
-    print(test.dict_items)
     print(test.initial_archive)
