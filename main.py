@@ -78,7 +78,7 @@ class TicTacToe:
                 
             elif self.user.agent != None and not self.board.game_over: 
                 # After the user starts playing a game!
-                # Display a game board.
+                # Display a game board and draw all moves made.
                 self.screen.fill(self.settings.bg_color)
                 self.board.update(self.board.state)
                 self.tiles.update(self.board)
@@ -88,17 +88,22 @@ class TicTacToe:
                 self.check_winner()
                 self.put_user_on_notice()
                 self.check_user_move()
+                # Check if the game is over.
+                # If negative, AI is the next mover. Then, calculate the optimal move for AI. 
+                self.check_winner()
+                self.put_user_on_notice()
+                # Make the most recently drawn screen visible.
+                pygame.display.flip()
                                     
-                # Check if the game is over, 
-                # If negative, AI is the next mover. Then, calculate the best move for AI. 
                 # Select a model for AI to find the optimal action for its move.     
                 if self.ai.on_turn and not self.user.on_turn:
                     # AI moves when the game is not over.
                     # AI can select a model to find the optimal action: 1. Random, 2. Axiomatic, 3. Mathematical, 4. Machine Learning.
+                    self.make_ai_move()
+                    time.sleep(1)
                     # Check the winner and display which player is going to move.
                     self.check_winner()
                     self.put_user_on_notice()
-                    self.make_ai_move()
                             
             elif self.user.agent != None and self.board.game_over:  
                 # Check if the user want to replay.
@@ -207,18 +212,21 @@ class TicTacToe:
                 title = f"Game Over: Tie."
             elif self.winner != None:
                 title = f"Game Over: {self.winner} wins."
-        elif self.user.on_turn:
-            title = f"Play as {self.user.agent_str}"
-        # elif self.ai.on_turn:
         else:
-            title = f"Computer thinking..."
+            if self.user.on_turn:
+                title = f"Play as {self.user.agent_str}"
+            # elif self.ai.on_turn:
+            elif self.ai.on_turn:
+                title = f"Computer thinking..."
         # Secondly, Show the title on the screen.    
         title_mid = self.settings.Font_Large.render(title, True, self.settings.obj_color)
         title_rect = title_mid.get_rect()
         title_rect.center = ((self.settings.screen_width / 2), 30)
         self.screen.fill(self.settings.bg_color)
+        # Display the game board and add the updated move on the board.
         self.tiles.update(self.board) # attr board=Board() required.
-        self.screen.blit(title_mid, title_rect) 
+        # Display the notice on the board.
+        self.screen.blit(title_mid, title_rect)
         
     def check_user_move(self):
         # Check if the user moved, and apply user's move to the state of the board.
@@ -248,16 +256,16 @@ class TicTacToe:
                                 self.board.update(self.board.state) # attr board.state required.
                                 # Update user's status after the user's move.
                                 self.user.update(self.board) # For user's update, attr class instance board required.
-                                self.ai.update(self.board)
-                                # Check the winner and Update the screen.
-                                self.check_winner()
-                                self.put_user_on_notice()
-                                self.tiles.update(self.board)
+                                self.ai.update(self.board) 
                                 # Write the user's move and save it in user's archive
                                 self.user.archive[self.board.count_filled] = self.user.action_optimal 
                                 # Make AI be the next mover.
                                 self.user.on_turn = False
-                                self.ai.on_turn = True                           
+                                self.ai.on_turn = True 
+        
+        # Display the user's move on the board.     
+        self.tiles.update(self.board) 
+                                      
 
     def make_ai_move(self):
         # Check if AI moves next, and calculate the best move for AI. 
@@ -289,15 +297,14 @@ class TicTacToe:
             # Update the status of the players.
             self.ai.update(self.board) 
             self.user.update(self.board) # For user's update, the classe instance board required.
-            # Update the screen.
-            self.check_winner()
-            self.put_user_on_notice()
-            self.tiles.update(self.board)
             # Save AI's move in user's archive.
             self.user.archive[self.board.count_filled] = self.ai.action_optimal
             # Make the user be the next player. 
             self.user.on_turn = True
-            self.ai.on_turn = False          
+            self.ai.on_turn = False        
+            
+            # Update AI's move on the board.
+            self.tiles.update(self.board)
     
     def reset(self):
         # Initialize

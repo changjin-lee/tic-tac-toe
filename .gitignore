@@ -1,6 +1,8 @@
-# Ignore .env files: Sensitive Information.
+# Ignore files with Sensitive Information.
 .env
-# Ignore the images folder: Not Implemented.
-images/
-# Ignore the .venv folder: Virtual Environment.
+
+# Ignore the folders Not Relavant.
 .venv/
+images/
+tests/
+__pycache__/

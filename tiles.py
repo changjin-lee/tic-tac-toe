@@ -35,6 +35,7 @@ class Tiles:
             tiles_list.append(row)
         return tiles_list
        
+    # Draw game board and display all moves made.
     def update(self, board): # attr board is an instance variable of the Board class: board = Board().
         """Draw OXs inside the tiles of the lattice board."""
         EMPTY_tile = " "
