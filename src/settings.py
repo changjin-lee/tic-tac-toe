@@ -22,9 +22,9 @@ class Settings:
         self.obj_color = (255, 255, 255) # white
     
         # Fonts settings for images on the board.
-        self.Font_Medium = pygame.font.Font('fonts/OpenSans-Regular.ttf', 28)
-        self.Font_Large = pygame.font.Font('fonts/OpenSans-Regular.ttf', 40)
-        self.Font_OX = pygame.font.Font('fonts/OpenSans-Regular.ttf', 60)
+        self.Font_Medium = pygame.font.Font('src/fonts/OpenSans-Regular.ttf', 28)
+        self.Font_Large = pygame.font.Font('src/fonts/OpenSans-Regular.ttf', 40)
+        self.Font_OX = pygame.font.Font('src/fonts/OpenSans-Regular.ttf', 60)
         
         # Tiles settings for OX images on the board.
         # square tile with the side's width of 80.
