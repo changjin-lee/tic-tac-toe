@@ -2,12 +2,12 @@
 # Tic-Tac-Toe Game!
 # written by Chang-Jin Lee in 2025
 
-- This project of writing tic-tac-toe game was set out by Chang-Jin Lee in 2025.
-
-- The main source codes comes from the Tic-Tac-Toe Project given by Harvard on-line Machine Learning course CS50 AI.
-I modified the codes into the class-based object-oriented-style codes.
-
-- The main structure of the modified codes comes from the booK "Python Crash Course, by Eric Mathes, 2nd Ed. no stark press (2019)".
+- This project is to make a simple tic-tac-toe game set out by Chang-Jin Lee in 2025 on the purpose of just a self-study. 
+- There may be some bugs in the codes especially in Monte Carlo Simulation, so that this codes should be used on the user's risk.
+- Reference:
+    1. The main source codes comes from the Tic-Tac-Toe Project given by Harvard on-line Machine Learning course CS50 AI.
+       I modified the source codes into a class-based object-oriented-style codes.
+    2. The main structure of the modified codes comes from the booK "Python Crash Course, by Eric Mathes, 2nd Ed. no stark press (2019)".
 
 Tasks for some improvements.
 A. Develop some strategies for AI to find the optimal action.
@@ -29,3 +29,13 @@ C. Implement logging
 D. Add more game modes.
     1. AI moves first mode.
     2. AI model selection mode.
+
+E. Add new features.
+    1. Pre-calculate the probability for USER to win for each tile and offer it when requested.
+
+F. Prepare packaging this python project.
+    1. pyproject.toml, setup.py
+    2. README.md, LICENSE
+    3. pytest
+    4. building and distribution: CI/CD
+    

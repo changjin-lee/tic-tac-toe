@@ -1,8 +1,7 @@
 # Ignore files with Sensitive Information.
 .env
-
 # Ignore the folders Not Relavant.
 .venv/
-images/
 tests/
 __pycache__/
+src/images/

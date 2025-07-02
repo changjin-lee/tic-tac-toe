@@ -16,12 +16,13 @@ class MonteCarlo:
     def __init__(self, board_state, user_agent):
         # Get information about the board and the user.
         self.board_state = board_state
+        # print(f'Board State: {self.board_state}')
         self.user_agent = user_agent
         # Find self.tiles_empty from self.board_state.
-        self.tiles_empty = self.find_tiles_empty()
-        # self.ai_agent = -1 if self.user_agent == 1 else 1 # user_agent is 1 or -1.
-        self.ai_agent = - self.user_agent # user_agent is 1 or -1.
-        # Initialize the ai_move: This is the goal for this Monte Carlo simulation to achieve.
+        self.tiles_empty = self.find_tiles_empty(self.board_state)
+        self.ai_agent = -1 if self.user_agent == 1 else 1 # user_agent is 1 or -1.
+        # self.ai_agent = - self.user_agent # user_agent is 1 or -1.
+        # Initialize the ai_move: This is the final goal for this Monte Carlo simulation to achieve.
         self.ai_move = (None, None) 
         
         # Initialize local variables
@@ -33,25 +34,28 @@ class MonteCarlo:
         # Make an instance of the class of MCBoard, on which we perform a Monte Carlo simulation.
         self.mc_board = MCBoard() 
         # Update mc_board by self.board_state.
-        self.mc_board.update(self.board_state)
+        self.mc_board.update(self.board_state)  
+        # Create a completely independent list from self.board_state using copy.deepcopy().
+        self.mc_state = copy.deepcopy(self.board_state)
+        # print(f'mc_state defined: {self.mc_state}')
         # Set the sampling size or the upper bound on how many sample to be collected for a round of MC simulation.
-        self.SAMPLE_SIZE = 40 
+        self.SAMPLE_SIZE = 30 
         # Set the upper bound on how many MC-rounds to be run for the MC Simulation.
         self.ITERATION_SIZE = 10
         # Create vaiables to save the data obtained from many rounds of the Monte Carlo Simulations.
         # At an intermediate stage, it has the form of {(0, 0): {1: [ ... ], 0: [ ... ], -1: [ ... ]}, ... } 
         # where each [ ... ] has integers 1, 0, -1 as many as self.ITERATION_SIZE.
         # Finally, [ ... ] turns into a frequency number and then the probability for each player to win.
-        self.data = { key: {1: {}, 0: {}, -1: {}} for key in self.tiles_empty} 
+        self.data = { key: {1: 0 , 0: 0, -1: 0} for key in self.tiles_empty } 
         self.data_sorted = {} # sorted self.data according to the probability.
         # self.game_record = [] # Each game record can be stored: [(1, 1), (0, 0), (2, 0), (0, 2), (0, 1), ...].
 
-    def find_tiles_empty(self):
+    def find_tiles_empty(self, board_state):
         # matrix = self.board_state
-        matrix = self.board_state
-        tiles_empty = []
+        # matrix = board_state
+        tiles_empty = [] # List of coordinates (i, j)
         
-        for i, row in enumerate(matrix):
+        for i, row in enumerate(board_state):
             for j, element in enumerate(row):
                 if element == 0:
                     tiles_empty.append((i, j))
@@ -62,13 +66,12 @@ class MonteCarlo:
     # If not, roll a dice once again to put a ai_move until the end of the game.
     def generate_mc_data(self):  
         """ Performs a single round of MC simulation to generate self.mc_data.
-            in the from of self.mc_data: {(0,0): {1: 3, 0: 2, -1: 5}, (0, 1): {1: 4, 0: 2, -1: 4}, ... }."""     
-        # Create a completely independent list from self.board_state using copy.deepcopy().
-        self.mc_state = copy.deepcopy(self.board_state)
+            in the from of self.mc_data: {(0,0): {1: 3, 0: 2, -1: 5}, (0, 1): {1: 4, 0: 2, -1: 4}, ... }."""   
+        # print(f'mc_state in generating MC: {self.mc_state}')
         # Create a local variable completely independent from self.tiles_empty using copy.deepcopy().  
         self.mc_tiles_empty = copy.deepcopy(self.tiles_empty)
-        # Create a tuple of the coordinates of a tile chosen randomly for AI's move.
-        self.mc_tile_chosen = () 
+        # Create a variable to represent tiles to be checked and initialize it as self.mc_tiles_empty.
+        self.mc_tiles_not_checked = self.mc_tiles_empty
         # Make an empty list to save the winner for each game.
         self.mc_winners = [] # In this list, we save the winner from {1, o, -1} for each game as many as upto self.SAMPLE_SIZE.
         # From self.mc_winners = [1, 0, -1, -1, -1, 0, 1, 1, -1, -1], we count the frequencies for 1, 0, -1, 
@@ -79,16 +82,24 @@ class MonteCarlo:
         # This is the final result of a single round of the MC simulation.
         self.mc_data = {} # {(0,0): {1: 3, 0: 2, -1: 5}, (0, 1): {1: 4, 0: 2, -1: 4}, ... } 
         
-        while len(self.mc_tiles_empty) > 0 and self.ai_move == (None, None):
-            # Pick up a tile for AI to occupy, and then, for that choice, calculate the probability for AI to win.
-            self.mc_tile_chosen = random.choice(self.mc_tiles_empty)
+        while len(self.mc_tiles_not_checked) > 0 and self.ai_move == (None, None):
+            # Create a varialbe to save the coordinates of the tile for AI's move.
+            # Make a random choice of a tile for AI, and calculate the probability for AI to win at that position.
+            self.mc_tile_chosen = random.choice(self.mc_tiles_not_checked)
+            # print(f'tiles not checked: {self.mc_tiles_not_checked}')
             # Remove the tile chosen by AI.
-            self.mc_tiles_empty.remove(self.mc_tile_chosen) 
+            self.mc_tiles_not_checked.remove(self.mc_tile_chosen) 
+            # print(f'mc_state while MC before selection: {self.mc_state}')
             # Apply ai_move on the board at self.mc_tile_chosen: Mark ai_agent on the tile_chosen.
             (m, n) = self.mc_tile_chosen
-            self.mc_state[m][n] = self.ai_agent
+            self.mc_state_chosen = copy.deepcopy(self.mc_state)
+            self.mc_state_chosen[m][n] = self.ai_agent
+            # print(f'mc_state while MC: {self.mc_state}')
+            # print(f'mc_state chosen while MC: {self.mc_state_chosen}')
             # Update the mc_board to make it reflect the updated self.mc_state.
-            self.mc_board.update(self.mc_state)
+            self.mc_board.update(self.mc_state_chosen)
+            # print(f'mc_board.state while MC: {self.mc_board.state}')
+            # print(f'board.game_over: {self.mc_board.game_over}')
             # Set a flag for checking if self.mc_data has been determined or not.
             self.mc_data_found = False 
             
@@ -96,8 +107,13 @@ class MonteCarlo:
             # Just take it as ai_move and break the while loop. 
             # Of course, there could be more tiles to make AI win. Let consider such a case later. 
             if self.mc_board.game_over:
+                print(f'AI wins: {self.mc_tile_chosen}')
+                # print(f'mc_state: {self.mc_state}')
+                # print(f'mc_state chosen: {self.mc_state_chosen}')
                 # Since the tile_chosen make AI win, set the winner of each MC simulation be AI.
+                # game_tie doesn't need to be considered.
                 self.mc_winners = [self.ai_agent for sample in range(self.SAMPLE_SIZE)]
+                # print(self.mc_winners)
                 # Convert self.mc_winners into a dict in frequency.
                 self.convert_into_freqency()
                 # Save the self.mc_winners_frequency in the dictionary of self.mc_data.
@@ -107,17 +123,21 @@ class MonteCarlo:
                 # Inform self.mc_data has been determined by setting the flag self.mc_data_found as True.
                 self.mc_data_found = True
             
-            elif self.user_win():
+            elif self.makes_user_win():
                 # This is the second best choice for AI, which prevents the user from being the winner in the following user's turn.
                 # Therefore, if I put AI in the self.mc_winners on purpose, which will increase the probability for AI to win at this position.
                 # On the other hand, if I put USER in the self.winners, which will increase the probabiity for USER to win at this position.
                 # Investgating the performances of the two cases above, putting AI in the self.winners performs better for AI.
                 # In case that we have a chance to win at a position and also to lose at another position, 
                 # we need to set up a rule which tells AI to choose the better postion to win first rather than to prevent USER from winning.
+                print(f'Block User: {self.mc_tile_chosen}')
+                # print(f'mc_state: {self.mc_state}')
+                # print(f'mc_state chosen: {self.mc_state_chosen}')
                 self.mc_winners = [self.ai_agent for sample in range(self.SAMPLE_SIZE)]   
                 # Set the last number of self.mc_winners as 0, which means game_tie and decreases the frequency for AI to win just by one. 
                 # This make AI choose the position to win first rather thant to prevent USER from winning. 
                 self.mc_winners[-1] = 0  
+                # print(self.mc_winners)
                 # Convert self.mc_winners into a dict in frequency.
                 self.convert_into_freqency()
                 # Save the self.mc_winners_frequency in the data dictionary
@@ -129,11 +149,16 @@ class MonteCarlo:
             # Perform Monte Carlo simulation to generate a possible random state of the game with the tiles remained.
             # Since AI has already picked up one empty tile, now it is user's turn.
             elif self.ai_move == (None, None) and not self.mc_data_found:
-                for sample in range(self.SAMPLE_SIZE):
-                    # Create local variables using copy.deepcopy().
-                    mc_matrix = copy.deepcopy(self.mc_state)
-                    mc_tiles_empty = copy.deepcopy(self.mc_tiles_empty)
-                    mc_board = self.mc_board # deepcopy makes an error here. I don't know why and what it means.
+                print(f'MC runs: {self.mc_tile_chosen}')
+                # print(f'mc_state: {self.mc_state}')
+                # print(f'mc_state chosen: {self.mc_state_chosen}')
+                for each_random_game in range(self.SAMPLE_SIZE):
+                    # Create local variables mc_matrix to check and initialize it as self.mc_state with the ai_move added.
+                    mc_matrix = copy.deepcopy(self.mc_state_chosen)
+                    # print(f'mc_state_chosen in for loop: {mc_matrix}')
+                    mc_tiles_empty = self.find_tiles_empty(mc_matrix)
+                    # print(f'mc_tiles_empty: {mc_tiles_empty}')
+                    mc_board = self.mc_board # deepcopy makes an TypeError here. I don't know why.
                     mc_board.update(mc_matrix)
                     mc_winner = None # This takes only one number in the while loop below.
                     while not mc_board.game_over:
@@ -141,9 +166,11 @@ class MonteCarlo:
                             if tile_count % 2 == 0: # Check if it is the user's turn.
                                 mc_tile_occupied = random.choice(mc_tiles_empty)
                                 mc_tiles_empty.remove(mc_tile_occupied)
+                                # print(f'mc_tiles_empty: {mc_tiles_empty}')
                                 # Apply user_move to the board: Mark user_agent on the mc_board.
                                 i, j = mc_tile_occupied
                                 mc_matrix[i][j] = self.user_agent
+                                # print(f'mc_matrix: {mc_matrix}')
                                 mc_board.update(mc_matrix)
                                 if mc_board.count_filled == 9 and mc_board.game_tie:
                                     mc_winner = 0
@@ -153,39 +180,48 @@ class MonteCarlo:
                                 elif mc_board.game_over:
                                     mc_winner = self.user_agent
                                     # Save the winner for each sample game into self.mc_winners.
-                                    self.mc_winners.append(mc_winner)                             
+                                    self.mc_winners.append(mc_winner)                         
                                     break
                             elif tile_count % 2 == 1: # Check if it is AI's turn.
                                 mc_tile_occupied = random.choice(mc_tiles_empty)
                                 mc_tiles_empty.remove(mc_tile_occupied)
+                                # print(f'mc_tiles_empty: {mc_tiles_empty}')
                                 # Apply ai_move to the board: Mark ai_agent on the board.
                                 i, j = mc_tile_occupied
                                 mc_matrix[i][j] = self.ai_agent
+                                # print(f'mc_matrix: {mc_matrix}')
                                 mc_board.update(mc_matrix)   
                                 if mc_board.game_over:
                                     mc_winner = self.ai_agent
                                     # Save the winner for each sample game into self.mc_winners.
                                     self.mc_winners.append(mc_winner)
                                     break
-                        
+                                
                 # Convert self.mc_winners into the list of self.mc_winners_frequency.
                 # For example, self.mc_winners: [1, 1, 0, 0, -1, 0, 0, 1, -1, -1]
                 # self.convert_into_frequency() generates a dict of the form of {1: 3, 0: 4, -1: 3},
                 # where the keys of 1, 0, -1 stand for the winners of a game: X, Tie, O respectively.
                 # Convert self.mc_winners into a dict in frequency as given above.
+                print(self.mc_winners)
                 self.convert_into_freqency()
                 # Save the self.mc_winners_frequency in the dict of self.mc_data: {(0, 1): {1: 3, 0: 4, -1: 3}, ... }
                 self.mc_data[self.mc_tile_chosen] = self.mc_winners_frequency
                 # Reset self.mc_winners, self.mc_winners_frequency.
                 self.reset()
+                self.mc_data_found = True
                 
                 # The size of self.mc_winners is as same as self.SAMPLE_SIZE.
                 # The size of sample shouldn't be too big because of the limitation of the memory.
+                
+            # Reset self.mc_state to check another position for AI.
+            # self.mc_state = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            self.mc_state = copy.deepcopy(self.board_state)
             # print(self.mc_data)
                 
     def reset(self):
         self.mc_winners = []
         self.mc_winners_frequency = {}
+        
         
     def convert_into_freqency(self):
         """Obtain the frequency of the same element in the list of self.mc_winners."""
@@ -198,20 +234,24 @@ class MonteCarlo:
         # print(mc_winners_frequency)
         self.mc_winners_frequency = mc_winners_frequency
         
-    def user_win(self):
+    def makes_user_win(self):
         """Check if mc_tile_chosen makes the user win."""
         (m, n) = self.mc_tile_chosen
         # Temporarily change the value of self.mc_state[m][n] just for a check from self.ai-agent to self.user_agent.
-        self.mc_state[m][n] = self.user_agent
+        self.mc_state_chosen[m][n] = self.user_agent
         # print(self.mc_state)
         # Update the mc_board to make it reflect the new self.mc_state.
-        self.mc_board.update(self.mc_state)
+        self.mc_board.update(self.mc_state_chosen)
         if 3 * self.user_agent in self.mc_board.sum_list:
             # print(f'mc_tile_chosen makes user win: {self.mc_board.sum_list}')
             # Recover the value of self.mc_state and self.mc_board before finishing this check.
-            self.mc_state[m][n] = self.ai_agent
-            self.mc_board.update(self.mc_state)
+            self.mc_state_chosen[m][n] = self.ai_agent
+            self.mc_board.update(self.mc_state_chosen)
             return True 
+        else:
+            self.mc_state_chosen[m][n] = self.ai_agent
+            self.mc_board.update(self.mc_state_chosen)
+            return False
     
     def perform_mc_simulation(self):
         """ performs several rounds of MC_simulations to get a set of self.mc_data, 
@@ -235,16 +275,14 @@ class MonteCarlo:
         # sample_mean = np.mean(data), 
         # sample_standard deviation = np.std(data),
         # technical statistics : scipy.stats.describe(data),
-        # and so on.          
-
-        while self.ai_move == (None, None):
-            # Temporarily, self.mc_winners_frequency goes into the values of self.freq_dist below.
-            self.freq_dist = { key: {1: [], 0: [], -1: []} for key in self.tiles_empty} 
-            
-            
-            # Set a flag to check if the self.ai_move is found.
-            ai_move_found = False
-            
+        # and so on. 
+        
+        # Temporarily, self.mc_winners_frequency goes into the values of self.freq_dist below.
+        self.freq_dist = { key: {1: [], 0: [], -1: []} for key in self.tiles_empty} 
+        # Set a flag to check if the self.ai_move is found.
+        ai_move_found = False
+        
+        while self.ai_move == (None, None):        
             # Performs several rounds of MC simulations upto self.ITERATION_SIZE.
             for mc_round_index in range(self.ITERATION_SIZE):
                 # Generate self.mc_data: {(0, 1): {1: 3, 0: 4, -1: 3}, ... }
@@ -260,14 +298,21 @@ class MonteCarlo:
 
                 for tile in self.tiles_empty:
                     for i in [1, 0, -1]:
-                        temp = self.mc_data[tile][i] if tile in self.tiles_empty else 0
-                        self.freq_dist[tile][i].append(temp)
+                        try:
+                            temp = self.mc_data.get(tile).get(i, 0)
+                            self.freq_dist[tile][i].append(temp)
+                        except (KeyError, TypeError):
+                            continue
             # Display the result of self.data.
-            # print(self.data_temp)
+            print(self.freq_dist)
             
             # Check if self.ai_move has been found. If positive, break this while loop.
             if ai_move_found:
                 break
+            
+            # Create an instance of the class of MCData, and find statistical information of self.freq_dist.
+            # For example, histogram, mean, variance, maximum likelyhood.
+            # mc_stats = MCData(self.freq_dist, self.SAMPLE_SIZE)
             
             # Perform statistical analysis on self.data_sorted.            
             for tile in self.tiles_empty:
@@ -278,7 +323,7 @@ class MonteCarlo:
                     # self.data[tile][i] = (round(mean, 2), round(stdev, 2))
             # Display the result of mean values.
             # print(self.data)
-            
+        
             # Find the optimal actions for AI
             self.find_optimal_action()
 
@@ -310,7 +355,7 @@ class MonteCarlo:
             elif mean_max == mean_user:
                 self.mc_ai_move = key_user
             elif mean_max == mean_tie:
-                self.mc_ai_move = key_user
+                self.mc_ai_move = key_tie
             else:
                 break
                     

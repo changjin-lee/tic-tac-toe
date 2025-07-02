@@ -21,6 +21,6 @@ from tictactoe import TicTacToe
             
 # Main starts here!            
 if __name__ == '__main__':
-    # Make a game instance, and run the game.
+    # Make a game instance, and run a game.
     ttt = TicTacToe()
     ttt.run_game()
