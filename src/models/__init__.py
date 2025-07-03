@@ -13,4 +13,4 @@ from .simple_random import *
 from .model_random import *
 from .mc_board import *
 from .axiomatic import *
-from .mc_data import *
+from .mc_stats import *

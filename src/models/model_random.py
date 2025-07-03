@@ -22,7 +22,7 @@ class ModelRandom:
         # Execute board.update(board.state) to get matrix, count_filled, sum_list from board.update(board.state)
         # Find the number of tiles filled on board: count_filled from board.update(board.state)
         # ---------------------------------------
-        # Model Random: Monte Carlo Strategy: 
+        # Model Random Strategy 1: Monte Carlo
         # ---------------------------------------
         #   - choose any empty tile at random:
         #       1. make a list of tuples: (i, j) for the coordinates of an empty tile, where i = 0, 1, 2 and j = 0, 1, 2.
@@ -33,7 +33,8 @@ class ModelRandom:
         #       5. Calculate the probability distribution for AI to win or to lose or to make a tie.
         #       6. Repeat the steps from 2 to 5 for another randomly chosen place in the list of empty tiles not taken.
         #       7. First of all, find all the cases in which AI can win, and then choose the place where AI is most probable to win. 
-        #       8. If step #7 is not fulfilled, find all the cases in which AI can make a tie, and then choose the place where AI is most probable to make a tie.  #       9. If step $8 is not fulfilled, find all the case in which AI can lose, and then choose the place AI is least probable to lose.
+        #       8. If step #7 is not fulfilled, find all the cases in which AI can make a tie, and then choose the place where AI is most probable to make a tie.  
+        #       9. If step $8 is not fulfilled, find all the case in which AI can lose, and then choose the place AI is least probable to lose.
         #       10. Return the result as the ai_move or the optimal action for AI.
 
         # -------------------------------
@@ -47,11 +48,6 @@ class ModelRandom:
         # The result of MC simulation data, mc.data, has the form of a dictionary: for each empty tile with (i, j) as a key and its value with {1: 3, 0: 2, -1: 5}.
         # For example: 
         # mc.data = {(0, 2): {1: 2, 0: 4, -1: 4}, (2, 2): {1: 0, 0: 0, -1: 10}, (2, 1): {1: 0, 0: 0, -1: 10}, (1, 2): {1: 0, 0: 0, -1: 10}}.     
-       
-        # To see the result of Monte Carlo simulation, print its result saved in self.ai_move.
-        print(mc.ai_move)
-        return mc.ai_move
-        
 
         # -----------------------------    
         # 2. Model Random: Simple Random
@@ -60,9 +56,12 @@ class ModelRandom:
         # No sophistcated strategy is adopted but just a simple random choice.
         # sr = SimpleRandom(self.board_state, self.user_agent)
         
-        # # To see the result of Monte Carlo simulation, print its result saved as self.ai_move.
-        # print(sr.ai_move)
-        # return sr.ai_move
+        #-----------------------
+        # Model Random: Result
+        # ----------------------
+        # To see the result of Monte Carlo simulation, print its result saved in self.ai_move.
+        print(mc.ai_move)
+        return mc.ai_move
         
  
 def main():
