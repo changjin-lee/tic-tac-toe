@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+import statistics, copy, random
+
 # Import rcParams to use Korean fonts.
 from matplotlib import rcParams
 rcParams["font.family"] = "Malgun Gothic"
@@ -15,28 +17,85 @@ class MCData:
     # For example, the method of self.generate_mc_data() in the class of MonteCarlo generates 
     # self.mc_data: {(0,0): {1: 3, 0: 2, -1: 5}, (0, 1): {1: 4, 0: 2, -1: 4}, ... }.
     
-    def __init__(self, freq_dist=None, sample_size=None):
+    def __init__(self, freq_dist=None, sample_size=None, user_agent=None):
         self.freq_dist = freq_dist
         self.sample_size = sample_size
+        self.user_agent = user_agent
+        # self.initialize()
+        
+    def initialize(self):
+        # print(self.freq_dist)
+        self.prob_dist = copy.deepcopy(self.freq_dist)
+        self.prob_dist = self.convert_to_prob()
         self.sorted= {}
-        # print(f'Data: {self.freq_dist}')
-        self.initialize()
+        print(f'Prob Data: {self.prob_dist}')
+        self.plot_histogram()
+        # Create vairables to save mean and std of the normal distribution of self.prob_dist.
+        self.norm_output = copy.deepcopy(self.freq_dist)
+        # Find normal distribution for self.prob_dist.
+        self.find_normal_dist()
+        # Display the result of mean and std values.
+        print(self.norm_output)
+
+    def convert_to_prob(self):
+        for key, value in self.prob_dist.items():
+            for winner, freq_list in value.items(): 
+                temp = []
+                for element in freq_list:
+                    temp.append(round(element / self.sample_size, 4))
+                # print(temp)
+                self.prob_dist[key][winner] = temp
+        return self.prob_dist    
 
         
-    def initialize(self):    
+    def plot_histogram(self):    
         # data = np.random.normal(0, 1, 1000) # 평균 0, 표준편차 1인 데이터 생성
-        data = [item[1] for item in self.freq_dist.values()]
-        plt.hist(data, bins=30) # 30개의 구간으로 나눔
-        plt.xlabel("값")
-        plt.ylabel("빈도")
-        plt.title("히스토그램")
+        label_histo = list(str(key) for key in self.prob_dist.keys())
+        print(label_histo)
+        data = [item[1] for item in self.prob_dist.values()]
+        plt.hist(data, label=label_histo)  # 30개의 구간으로 나눔
+        plt.xlabel("probability")
+        plt.ylabel("freqency")
+        plt.title("Dist. of probability for USER to win")
+        plt.legend()
         plt.show()
 
+    def find_normal_dist(self):
+        # Perform statistical analysis on self.data_sorted.      
+        tiles_empty = list(self.prob_dist.keys())
+        print(tiles_empty) 
+        for tile in tiles_empty:
+            # print(self.prob_dist[tile])
+            for i in [1, 0, -1]:
+                mean = statistics.mean(self.prob_dist[tile][i])
+                stdev = statistics.stdev(self.prob_dist[tile][i])
+                # print(mean, stdev)
+                # self.norm_output[tile][i] = round(mean, 3)
+                self.norm_output[tile][i] = (round(mean, 3), round(stdev, 3))
 
+
+
+    def find_stats(self):
+        tile = list(self.freq_dist.keys())
+        print(tile)
+        data = self.freq_dist[tile[0]]
+        df = pd.DataFrame(data)
+        df2 = df.transform(lambda x: round(x / self.sample_size, 4))
+        print(df)
+        print(df.index)
+        print(df.mean())
+        print(df.describe())    
+        print(df2.describe()) 
+        
+        
         
 if __name__ == "__main__":
     
     mcd = MCData()
-    mcd.freq_dist = {(0, 0): {1: [0, 100, 0, 52, 0, 0, 0, 0, 0, 0, 72, 0, 66, 100, 100, 0, 100, 0, 0, 0], 0: [1, 0, 100, 0, 1, 1, 0, 0, 0, 1, 28, 100, 34, 0, 0, 1, 0, 0, 0, 0], -1: [99, 0, 0, 48, 99, 99, 100, 100, 100, 99, 0, 0, 0, 0, 0, 99, 0, 100, 100, 100]}, (2, 0): {1: [100, 31, 35, 0, 32, 0, 32, 0, 0, 0, 100, 38, 0, 37, 32, 0, 38, 100, 0, 0], 0: [0, 69, 65, 100, 68, 0, 68, 100, 0, 0, 0, 62, 100, 63, 68, 0, 62, 0, 100, 100], -1: [0, 0, 0, 0, 0, 100, 0, 0, 100, 100, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0]}, (2, 1): {1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0: [0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1], -1: [100, 99, 99, 99, 100, 99, 99, 99, 99, 99, 100, 99, 100, 100, 99, 99, 100, 99, 99, 99]}, (2, 2): {1: [100, 0, 0, 0, 100, 62, 0, 48, 0, 48, 0, 0, 0, 0, 0, 67, 0, 69, 69, 67], 0: [0, 0, 0, 0, 0, 38, 100, 0, 100, 0, 1, 0, 1, 1, 0, 33, 1, 31, 31, 33], -1: [0, 100, 100, 100, 0, 0, 0, 52, 0, 52, 99, 100, 99, 99, 100, 0, 99, 0, 0, 0]}}
-    
+    mcd.freq_dist = {(0, 0): {1: [30, 5, 12, 12, 6, 9, 13, 12, 7, 14, 10, 10, 8, 10, 8, 9, 13, 17, 13, 9, 13, 8, 9, 6, 11, 17, 8, 10, 8, 6], 0: [0, 25, 18, 18, 24, 21, 17, 18, 23, 16, 20, 20, 22, 20, 22, 21, 17, 13, 17, 21, 17, 22, 21, 24, 19, 13, 22, 20, 22, 24], -1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, (0, 1): {1: [8, 5, 8, 7, 13, 8, 12, 11, 11, 7, 11, 11, 5, 15, 12, 9, 15, 13, 13, 10, 11, 18, 6, 8, 11, 9, 7, 16, 7, 10], 0: [22, 25, 22, 23, 17, 22, 18, 19, 19, 23, 19, 19, 25, 15, 18, 21, 15, 17, 17, 20, 19, 12, 24, 22, 19, 21, 23, 14, 23, 20], -1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, (0, 2): {1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], -1: [29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29]}, (2, 1): {1: [9, 10, 8, 8, 5, 8, 11, 8, 11, 9, 10, 11, 9, 12, 7, 11, 5, 9, 12, 4, 6, 12, 9, 9, 13, 13, 6, 11, 11, 13], 0: [21, 20, 22, 22, 25, 22, 19, 22, 19, 21, 20, 19, 21, 18, 23, 19, 25, 21, 18, 26, 24, 18, 21, 21, 17, 17, 24, 19, 19, 17], -1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}}
+    mcd.sample_size = 30
+    mcd.user_agent = 1
+
     mcd.initialize()
+    # mcd.data_series()
+    mcd.find_stats()

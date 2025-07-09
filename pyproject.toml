@@ -1,0 +1,19 @@
+[project]
+name = "TicTacToe"
+version = "0.0.1"
+authors = [
+  { name="Changjin Lee", email="changjin.lee.phys@google.com" },
+]
+description = "A TicTacToe Game with a simple AI"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/changjin-lee/tic-tac-toe"
+Issues = "https://github.com/changjin-lee/tic-tac-toe/issues"

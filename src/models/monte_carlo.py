@@ -39,15 +39,16 @@ class MonteCarlo:
         self.mc_state = copy.deepcopy(self.board_state)
         # print(f'mc_state defined: {self.mc_state}')
         # Set the sampling size or the upper bound on how many sample to be collected for a round of MC simulation.
-        self.SAMPLE_SIZE = 30 
+        self.SAMPLE_SIZE = 10 # Sample size 10 makes a fun game because AI makes a mistake quite often.
         # Set the upper bound on how many MC-rounds to be run for the MC Simulation.
-        self.ITERATION_SIZE = 20
+        self.ITERATION_SIZE = 10
         # Create vaiables to save the data obtained from many rounds of the Monte Carlo Simulations.
         # At an intermediate stage, it has the form of {(0, 0): {1: [ ... ], 0: [ ... ], -1: [ ... ]}, ... } 
         # where each [ ... ] has integers 1, 0, -1 as many as self.ITERATION_SIZE.
-        # Finally, [ ... ] turns into a frequency number and then the probability for each player to win.
-        self.data = { key: {1: 0 , 0: 0, -1: 0} for key in self.tiles_empty } 
-        self.data_sorted = {} # sorted self.data according to the probability.
+        # Intermediately, [ ... ] turns into frequency numbers in a normal dist as anticipated,
+        # and then finally into the probabilities for each player to win.
+        self.norm_output = { key: {1: 0 , 0: 0, -1: 0} for key in self.tiles_empty } 
+        self.norm_sorted = {} # sorted self.norm_output in a descending order.
         # self.game_record = [] # Each game record can be stored: [(1, 1), (0, 0), (2, 0), (0, 2), (0, 1), ...].
 
     def find_tiles_empty(self, board_state):
@@ -107,8 +108,7 @@ class MonteCarlo:
             # Just take it as ai_move and break the while loop. 
             # Of course, there could be more tiles to make AI win. Let consider such a case later. 
             if self.mc_board.game_over:
-                print(f'AI wins: {self.mc_tile_chosen}')
-                
+                # print(f'AI wins: {self.mc_tile_chosen}')
                 # print(f'mc_state: {self.mc_state}')
                 # print(f'mc_state chosen: {self.mc_state_chosen}')
                 # Since the tile_chosen make AI win, set the winner of each MC simulation be AI.
@@ -131,7 +131,7 @@ class MonteCarlo:
                 # Investgating the performances of the two cases above, putting AI in the self.winners performs better for AI.
                 # In case that we have a chance to win at a position and also to lose at another position, 
                 # we need to set up a rule which tells AI to choose the better postion to win first rather than to prevent USER from winning.
-                print(f'Block User: {self.mc_tile_chosen}')
+                # print(f'Block User: {self.mc_tile_chosen}')
                 # print(f'mc_state: {self.mc_state}')
                 # print(f'mc_state chosen: {self.mc_state_chosen}')
                 self.mc_winners = [self.ai_agent for sample in range(self.SAMPLE_SIZE)]   
@@ -150,7 +150,7 @@ class MonteCarlo:
             # Perform Monte Carlo simulation to generate a possible random state of the game with the tiles remained.
             # Since AI has already picked up one empty tile, now it is user's turn.
             elif self.ai_move == (None, None) and not self.mc_data_found:
-                print(f'MC runs: {self.mc_tile_chosen}')
+                # print(f'MC runs: {self.mc_tile_chosen}')
                 # print(f'mc_state: {self.mc_state}')
                 # print(f'mc_state chosen: {self.mc_state_chosen}')
                 for each_random_game in range(self.SAMPLE_SIZE):
@@ -175,13 +175,13 @@ class MonteCarlo:
                                 mc_board.update(mc_matrix)
                                 if mc_board.count_filled == 9 and mc_board.game_tie:
                                     mc_winner = 0
-                                    print(f'mc Tie ({i}, {j}): mc matrix: {mc_matrix}')
+                                    # print(f'mc Tie ({i}, {j}): mc matrix: {mc_matrix}')
                                     # Save the winner for each sample game into self.mc_winners.
                                     self.mc_winners.append(mc_winner) 
                                     break
                                 elif mc_board.game_over:
                                     mc_winner = self.user_agent
-                                    print(f'mc User wins ({i}, {j}): mc matrix: {mc_matrix}')
+                                    # print(f'mc User wins ({i}, {j}): mc matrix: {mc_matrix}')
                                     # Save the winner for each sample game into self.mc_winners.
                                     self.mc_winners.append(mc_winner)                         
                                     break
@@ -196,7 +196,7 @@ class MonteCarlo:
                                 mc_board.update(mc_matrix)   
                                 if mc_board.game_over:
                                     mc_winner = self.ai_agent
-                                    print(f'mc AI wins ({i}, {j}): mc matrix: {mc_matrix}')
+                                    # print(f'mc AI wins ({i}, {j}): mc matrix: {mc_matrix}')
                                     # Save the winner for each sample game into self.mc_winners.
                                     self.mc_winners.append(mc_winner)
                                     break
@@ -206,7 +206,7 @@ class MonteCarlo:
                 # self.convert_into_frequency() generates a dict of the form of {1: 3, 0: 4, -1: 3},
                 # where the keys of 1, 0, -1 stand for the winners of a game: X, Tie, O respectively.
                 # Convert self.mc_winners into a dict in frequency as given above.
-                print(self.mc_winners)
+                # print(self.mc_winners)
                 self.convert_into_freqency()
                 # Save the self.mc_winners_frequency in the dict of self.mc_data: {(0, 1): {1: 3, 0: 4, -1: 3}, ... }
                 self.mc_data[self.mc_tile_chosen] = self.mc_winners_frequency
@@ -308,7 +308,7 @@ class MonteCarlo:
                         except (KeyError, TypeError):
                             continue
             # Display the result of self.data.
-            print(self.freq_dist)
+            # print(self.freq_dist)
             
             # Check if self.ai_move has been found. If positive, break this while loop.
             if ai_move_found:
@@ -323,10 +323,10 @@ class MonteCarlo:
                 for i in [1, 0, -1]:
                     mean = statistics.mean(self.freq_dist[tile][i])/self.SAMPLE_SIZE
                     # stdev = statistics.stdev(self.data_temp[tile][i])/self.SAMPLE_SIZE
-                    self.data[tile][i] = round(mean, 3)
+                    self.norm_output[tile][i] = round(mean, 3)
                     # self.data[tile][i] = (round(mean, 2), round(stdev, 2))
             # Display the result of mean values.
-            # print(self.data)
+            # print(self.norm_output)
         
             # Find the optimal actions for AI
             self.find_optimal_action()
@@ -334,40 +334,30 @@ class MonteCarlo:
         
     def find_optimal_action(self):
         """Determines which place is the optimal action for AI."""
+        # Select which rule or strategy to use to determine the optimal action for AI.
+        # The simple one is to choose the most probable position for any player or a game_tie.
+        # Find more strategies for the better performance.
+        # Here we take the MINIMAX strategy that maximizes the chance for AI to win and also minimize USER's.
+        # However, this strategy doesn't try to make a tie in case that AI is less probable to win than to lose.
+        # Find how to implement the second best strategy to make a tie rather than to lose.
         while self.ai_move == (None, None):
-            data_ai_sorted = dict(sorted(self.data.items(), key = lambda item: item[1][self.ai_agent]-item[1][self.user_agent], reverse=True))
-            # data_user_sorted = dict(sorted(self.data.items(), key = lambda item: item[1][self.user_agent]-item[1][self.ai_agent]))
-            # data_tie_sorted = dict(sorted(self.data.items(), key = lambda item: item[1][0]-item[1][self.user_agent], reverse=True))
-            print(data_ai_sorted)
-            # print(data_user_sorted)
-            # print(data_tie_sorted)
+            # ---------------
+            # Strategy 1
+            # ---------------
+            # Sort the data according to the sum of the AI's probability to win and the negative USER's probability to win.
+            self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: item[1][self.ai_agent]-item[1][self.user_agent], reverse=True))
+            # ---------------
+            # Strategy 2
+            # ---------------
+            # Another new possible strategy is to count on the sum of both the difference of ai - user and tie - user,
+            # which is equivalent to 1 - 3 * user as below. This strategy also has pros and cons. This makes a better decision not to lose in case that no chance to win remains. However, we need to adjust the 
+            # tuning parameter manually to give the priority to win first rather than not to lose in the process of blocking user.
+            # self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: 1 - 3 * item[1][self.user_agent], reverse=True))
             
-            key_ai = list(data_ai_sorted.keys())[0]
-            # mean_ai = data_ai_sorted[key_ai][self.ai_agent]
-            # key_user = list(data_user_sorted.keys())[0]
-            # mean_user = data_user_sorted[key_user][self.user_agent]
-            # key_tie = list(data_tie_sorted.keys())[0]
-            # mean_tie = data_tie_sorted[key_tie][0] # 0 stands for game_tie.
-            
-            # Select which rule or strategy to use to determine the optimal action for AI.
-            # The simple one is to choose the most probable position for any player or a game_tie.
-            # Find more strategies for the better performance.
-            # mean_max = max(mean_ai, mean_user, mean_tie)
-            
-            # if mean_max == mean_ai:
-            #     self.mc_ai_move = key_ai
-            # elif mean_max == mean_user:
-            #     self.mc_ai_move = key_user
-            # elif mean_max == mean_tie:
-            #     self.mc_ai_move = key_tie
-            # else:
-            #     break
-            self.ai_move = key_ai    
-            # self.ai_move = self.mc_ai_move
-            
-            # return self.ai_move
-            # print(f'sorted: {self.data_sorted}')
-            # print(list(self.data_sorted.keys())[0])
+            # self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: item[1][self.ai_agent], reverse=True))
+            print(self.norm_sorted)
+
+            self.ai_move = list(self.norm_sorted.keys())[0]
     
         
 def main():

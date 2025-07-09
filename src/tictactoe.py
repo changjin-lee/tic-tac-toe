@@ -89,7 +89,7 @@ class TicTacToe:
                     # AI moves when the game is not over.
                     # AI can select a model to find the optimal action: 1. Random, 2. Axiomatic, 3. Mathematical, 4. Machine Learning.
                     self.make_ai_move()
-                    time.sleep(1)
+                    time.sleep(0.2)
                     # Check the winner and display which player is going to move.
                     self.check_winner()
                     self.put_user_on_notice()
