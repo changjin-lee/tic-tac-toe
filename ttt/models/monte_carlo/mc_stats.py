@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import statistics, copy, random
+import statistics, copy, random, time, math
 
 # Import rcParams to use Korean fonts.
 from matplotlib import rcParams
@@ -35,7 +35,7 @@ class MCData:
         # Find normal distribution for self.prob_dist.
         self.find_normal_dist()
         # Display the result of mean and std values.
-        print(self.norm_output)
+        print(f'mean, stdev: {self.norm_output}')
 
     def convert_to_prob(self):
         for key, value in self.prob_dist.items():
@@ -55,10 +55,11 @@ class MCData:
         data = [item[1] for item in self.prob_dist.values()]
         plt.hist(data, label=label_histo)  # 30개의 구간으로 나눔
         plt.xlabel("probability")
-        plt.ylabel("freqency")
+        plt.ylabel("count")
         plt.title("Dist. of probability for USER to win")
         plt.legend()
         plt.show()
+
 
     def find_normal_dist(self):
         # Perform statistical analysis on self.data_sorted.      
@@ -69,9 +70,12 @@ class MCData:
             for i in [1, 0, -1]:
                 mean = statistics.mean(self.prob_dist[tile][i])
                 stdev = statistics.stdev(self.prob_dist[tile][i])
+                mean = round(mean, 3)
+                stdev = round(stdev, 3)
                 # print(mean, stdev)
                 # self.norm_output[tile][i] = round(mean, 3)
-                self.norm_output[tile][i] = (round(mean, 3), round(stdev, 3))
+                self.norm_output[tile][i] = (mean, stdev)
+        # print(self.norm_output)
 
 
 

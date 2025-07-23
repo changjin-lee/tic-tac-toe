@@ -1,7 +1,12 @@
 # Ignore files with Sensitive Information.
 .env
-# Ignore the folders Not Relavant.
+# Ignore files not relavant.
+test_requirements.txt
+*.pyc*
+*.egg*
+# Ignore folders Not Relavant.
 .venv/
 tests/
 __pycache__/
-src/images/
+dist/
+build/

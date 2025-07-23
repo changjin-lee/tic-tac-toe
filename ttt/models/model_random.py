@@ -1,17 +1,18 @@
 # models.py includes several models to calculate the optimal action for AI.
 
-# Import several models
-from .monte_carlo import MonteCarlo
-from .simple_random import SimpleRandom
+# Import the model MonteCarlo from the package monte_carlo.
+from monte_carlo import *
+# from .simple_random import SimpleRandom
 
 class ModelRandom:
-    """A class Model includes several models to calculate the optimal action for AI."""
+    """This class includes Simple Random model and Monte Carlo Simulation model to calculate the optimal action for AI."""
     def __init__(self, board_state, user_agent):
         self.board_state = board_state # board is an instance of the Board class.
         self.user_agent = user_agent
 
-    # AI model: minimax algorithm.
-    def minimax(self):
+    # AI model: Monte Carlo algorithm. 
+    # The function name minimax below is not appropriate for Monte Carlo Algorithm.
+    def runs(self):
         """
         Returns the optimal action for the current player, AI_Agent, on the board.
         """
@@ -22,7 +23,7 @@ class ModelRandom:
         # Execute board.update(board.state) to get matrix, count_filled, sum_list from board.update(board.state)
         # Find the number of tiles filled on board: count_filled from board.update(board.state)
         # ---------------------------------------
-        # Model Random Strategy 1: Monte Carlo
+        # Model Random Strategy: Monte Carlo
         # ---------------------------------------
         #   - choose any empty tile at random:
         #       1. make a list of tuples: (i, j) for the coordinates of an empty tile, where i = 0, 1, 2 and j = 0, 1, 2.
@@ -67,7 +68,7 @@ class ModelRandom:
 def main():
     model = ModelRandom(board_state=[[-1, 1, 0], [1, -1, 0], [1, 0, 0]], user_agent=1)
     # Calculate the optimal action for AI
-    model.minimax()
+    model.runs()
     
 if __name__ == '__main__':
     # Import a Parent class from a higher folder.

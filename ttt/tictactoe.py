@@ -182,14 +182,14 @@ class TicTacToe:
             elif self.ai.win and not self.user.win:
                 return "AI"
             else:
-                return None 
+                return "Tie" 
         else:
             return None
         
     def check_winner(self):
         # Check whether the game is over or not.
         # by using self.board.game_over
-        self.winner = self.find_winner() # Returns You or AI or None in str    
+        self.winner = self.find_winner() # Returns You or AI or Tie in str    
 
     def put_user_on_notice(self):
         # Show the status of the current game on the screen.
@@ -197,7 +197,7 @@ class TicTacToe:
         # put user on notice: AI is thinking...
         # Determine which sentence to be shown on the board.
         if self.board.game_over:
-            if self.winner is None:
+            if self.winner == 'Tie':
                 title = f"Game Over: Tie."
             elif self.winner != None:
                 title = f"Game Over: {self.winner} wins."
@@ -274,9 +274,10 @@ class TicTacToe:
         # Calculate the optimal action for AI
         if self.ai.on_turn and not self.user.on_turn and not self.board.game_over:
             # Determine which model is to be used for AI.
-            model = ModelRandom(self.board.state, self.user.agent) # attr self.board.state = list, self.user.agent = 1 or -1.
+            # model = ModelRandom(self.board.state, self.user.agent) # attr self.board.state = list, self.user.agent = 1 or -1.
+            model = ModelMinimax(self.board.state, self.user.agent) # attr self.board.state = list, self.user.agent = 1 or -1.
             # Calculate the optimal action for AI
-            self.ai.action_optimal = model.minimax()
+            self.ai.action_optimal = model.runs()
             # time.sleep(0.5)
             # ai.action_optimal is the optimal action for ai to take.
             self.board.state = self.ai.apply_action_optimal(self.board, self.ai.action_optimal, self.ai.agent) 

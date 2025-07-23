@@ -344,19 +344,27 @@ class MonteCarlo:
             # ---------------
             # Strategy 1
             # ---------------
-            # Sort the data according to the sum of the AI's probability to win and the negative USER's probability to win.
+            # Sort the data according to the AI's probability to win extracted by the USER's probability to win,
+            # which seems to play a role of a minimax algorithm.
             self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: item[1][self.ai_agent]-item[1][self.user_agent], reverse=True))
             # ---------------
             # Strategy 2
             # ---------------
+            # self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: item[1][self.ai_agent]-item[1][self.tie_agent], reverse=True))
+            # ---------------
+            # Strategy 3
+            # ---------------
             # Another new possible strategy is to count on the sum of both the difference of ai - user and tie - user,
-            # which is equivalent to 1 - 3 * user as below. This strategy also has pros and cons. This makes a better decision not to lose in case that no chance to win remains. However, we need to adjust the 
-            # tuning parameter manually to give the priority to win first rather than not to lose in the process of blocking user.
+            # which is equivalent to 1 - 3 * user as below. This strategy also has pros and cons. This makes a better decision not to lose in case that no chance to win remains. 
+            # However, we need to adjust the tuning parameter manually to give the priority to win first rather than not to lose in the process of blocking user.
             # self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: 1 - 3 * item[1][self.user_agent], reverse=True))
+            # -----------------
+            # Strategy 4
+            # -----------------
+            # Mixed Strategy 1 and 2
+            # self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: max(item[1][self.ai_agent]-item[1][self.user_agent], item[1][self.ai_agent]-item[1][self.tie_agent]), reverse=True))
             
-            # self.norm_sorted = dict(sorted(self.norm_output.items(), key = lambda item: item[1][self.ai_agent], reverse=True))
             print(self.norm_sorted)
-
             self.ai_move = list(self.norm_sorted.keys())[0]
     
         
