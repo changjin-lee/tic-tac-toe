@@ -65,16 +65,19 @@ class Minimax:
         # If AI is the maximizer, the minimax function returns the possible actions and their values in a dictionary.
         # Perform Minimax algorithm without alpha-beta prunning.
         # self.minimax(self.initial_state, self.maximizer)
-        # Perform Minimax algorithm with alpha-beta prunning.
+        # ------------------------------------------------------------------
+        # Perform Minimax algorithm #1: with alpha-beta prunning: Wikipedia
+        # ------------------------------------------------------------------
+        # Warning: This algorithm doesn't work properly.
         # self.alpha = -math.inf
         # self.beta = +math.inf
-        # self.minimax(self.initial_state, self.depth_max, self.alpha, self.beta, self.maximizer)
-        #
-        # self.root_action = None
-        self.data.ai_move = self.minimax(self.initial_state, self.maximizer)
-        #
+        # self.minimax(self.initial_state, self.alpha, self.beta, self.maximizer)
         # self.data.generate_outcome(self.maximizer)
-        self.ai_move = self.data.ai_move
+        # self.ai_move = self.data.ai_move
+        # ---------------------------------------------------------------
+        # Minimax algorithm #2: With alpha-beta pruning: CS50 AI Harvard
+        # ---------------------------------------------------------------
+        self.ai_move = self.minimax(self.initial_state, self.maximizer)
         #
         print(f'Minimax done!')
         print(f'maximum depth: {self.depth_max}')
@@ -83,10 +86,46 @@ class Minimax:
         print(f'initial state: {self.initial_state}')
         print(f'initial actions: {self.initial_actions}')
         print(f'outcomes: {self.data.outcome}')
+        
+    # -----------------------------------------------------------------------------    
+    # Perform minimax algorithm for AI: with Alpha-Beta Prunning from Wikipedia
+    # ----------------------------------------------------------------------------- 
+    # def minimax(self, state, alpha, beta, maximizingPlayer):
+        
+    #     actions = self.find_actions(state)
+    #     depth = len(actions)
+    #     board = MMBoard(self.user_agent)
+    #     board.update(state)
+        
+    #     if depth == 0 or board.game_over:
+    #         return board.score
     
-    # --------------------------------------------------------------    
-    # Perform minimax algorithm for AI: with Alpha-Beta Prunning.
-    # --------------------------------------------------------------   
+    #     if maximizingPlayer:
+    #         value = - math.inf
+    #         for action in actions:
+    #             child_state = self.find_child_state(state, action, maximizer=True)
+    #             value = max(value, self.minimax(child_state, alpha, beta, False))
+    #             if depth == self.depth_max:
+    #                 self.data.outcome[action] = value
+    #             if value >= beta: 
+    #                 break 
+    #             alpha = max(alpha, value)
+    #         return value
+    #     else:
+    #         value = + math.inf
+    #         for action in actions:
+    #             child_state = self.find_child_state(state, action, maximizer=False)
+    #             value = min(value, self.minimax(child_state, alpha, beta, True))
+    #             if depth == self.depth_max:
+    #                 self.data.outcome[action] = value
+    #             if value <= beta: 
+    #                 break 
+    #             beta = min(beta, value)
+    #         return value
+    
+    # -----------------------------------------------------------------------------    
+    # Perform minimax algorithm for AI: with Alpha-Beta Prunning: Harvard CS50 AI.
+    # -----------------------------------------------------------------------------   
     # The source codes of minimax algorithm below comes from the course of CS50: AI at Havard university.
     # I kept its logic but modified some lines of the codes: variable's names and evaluation function and so on.
     def max_value(self, state, alpha, beta):

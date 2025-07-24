@@ -12,7 +12,9 @@
 Tasks for some improvements.
 A. Develop some strategies for AI to find the optimal action.
     1. Random Choices: At present, the strategy of AI is just a simple Random choice. 
-        This stragedy can be pursued a little more into the deeper layers in depth taking the user's random response once more into account and the AI's too and again to the end of the game. This strategy may be called a Monte Carlo Simulation: done!. This can be combined with the Bayesian theorem to correct the probability with a new evidence. 
+        - This stragedy can be pursued a little more into the deeper layers in depth taking the user's random response once more into account and the AI's too and again to the end of the game. This strategy may be called a Monte Carlo Simulation: done!. 
+        - This can be combined with the Bayesian theorem to correct the probability with a new evidence. 
+        - Monte Carlo Tree Search Algorithm(MCTS) is much more favorable.
     2. Axiomatic Rules: Develop axiomatic rules for AI to judge what to do or not.
     3. Minimax Algorithm: Implement the well-known algorithm to find the optimal action for AI: Done!.
     4. Mathematical Calculation: Perform a specific mathematical calculation to get the probability for AI to win for an AI's specific action or a move. Take into account of some possible user's responses in series into the deeper layers. 

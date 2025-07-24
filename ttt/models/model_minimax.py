@@ -40,11 +40,41 @@ class ModelMinimax:
         #   3. Evaluation function(or winner function(or score function) or utility function): 
         #     {player 1 wins: 1, player -1 wins: -1, game tie: 0}.
         # - Steps of Minimax: 1. Root node/Base node/Leaf node, 2. Recursive Exploration, 3. Backtracking.
+    
+        # ----------------------------------------------------------------
+        # - Pseudo Code for Minimax Algorithm 1: With Alpha-Beta Pruning
+        # ----------------------------------------------------------------  
+        # Warning: This algorithm found in Wikipedia doesn't work properly.
+        # 
+        # function alphabeta(node, depth, α, β, maximizingPlayer) is
+        #     if depth == 0 or node is terminal then
+        #         return the heuristic value of node
+        #     if maximizingPlayer then
+        #         value := −∞
+        #         for each child of node do
+        #             value := max(value, alphabeta(child, depth − 1, α, β, FALSE))
+        #             if value ≥ β then       (* beta is inherited from the parent node *)
+        #                 break               (* β cutoff *)
+        #             α := max(α, value)
+        #         return value
+        #     else
+        #         value := +∞
+        #         for each child of node do
+        #             value := min(value, alphabeta(child, depth − 1, α, β, TRUE))
+        #             if value ≤ α then       (* alpha is inherited from the parent node *)
+        #                 break               (* α cutoff *)
+        #             β := min(β, value)
+        #         return value
+        #
+        # (* Initial call *)
+        # alphabeta(origin, depth, −∞, +∞, TRUE)
+        # -----------------------------------------------
+        # Ref: Wikipedia/alpha-beta pruning
         
         # The source codes of minimax algorithm below comes from the course of CS50: AI at Havard university.
         # I kept its logic but modified some lines of the codes: variable's names and evaluation function and so on.
         # ----------------------------------------------------
-        # - Pseudo Code for Minimax Algorithm: With Pruning
+        # - Pseudo Code for Minimax Algorithm 2: With Pruning
         # ----------------------------------------------------
         # def minimax(self, state, alpha, beta, maximizer):
         #   """
@@ -77,6 +107,27 @@ class ModelMinimax:
         #               v = new_value
         #               optimal_action = action
         #       return optimal_action
+        
+        # def max_value(self, state, alpha, beta):
+        #   """
+        #   Returns the maximum value for the current player on the board 
+        #   using alpha-beta pruning.
+        #   """
+        #   actions = self.find_actions(state)
+        #   board = MMBoard(self.user_agent)
+        #   board.update(state)
+        
+        #   if board.game_over:
+        #       return board.score
+        
+        #   v = -math.inf
+        #   for action in actions:
+        #       child_state = self.find_child_state(state, action, maximizer=True)
+        #       v = max(v, self.min_value(child_state, alpha, beta))
+        #       alpha = max(alpha, v)
+        #       if alpha >= beta:
+        #           break
+        #   return v
         # ---------------------------------------------
         # Code Ref.: 
         # - Source codes from CS50AI at Havard Univ.
@@ -93,8 +144,7 @@ class ModelMinimax:
         # To see the result of Minimax algorithm, print its result saved in self.ai_move.
         print(mm.ai_move)
         return mm.ai_move     
-        # [[0, 0, -1], [0, 1, 1], [0, 0, 0]]
-        
+
 def main():
     model = ModelMinimax(board_state=[[-1, -1, 1], [0, 1, 0], [0, 0, 1]], user_agent=1)
     # Calculate the optimal action for AI
