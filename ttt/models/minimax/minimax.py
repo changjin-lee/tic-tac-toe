@@ -68,16 +68,14 @@ class Minimax:
         # ------------------------------------------------------------------
         # Perform Minimax algorithm #1: with alpha-beta prunning: Wikipedia
         # ------------------------------------------------------------------
-        # Warning: This algorithm doesn't work properly.
-        # self.alpha = -math.inf
-        # self.beta = +math.inf
-        # self.minimax(self.initial_state, self.alpha, self.beta, self.maximizer)
+        # Warning: This algorithm doesn't work properly.<< bugs corrected!
+        self.ai_move = self.minimax(self.initial_state, - math.inf, + math.inf, self.maximizer)
         # self.data.generate_outcome(self.maximizer)
         # self.ai_move = self.data.ai_move
         # ---------------------------------------------------------------
         # Minimax algorithm #2: With alpha-beta pruning: CS50 AI Harvard
         # ---------------------------------------------------------------
-        self.ai_move = self.minimax(self.initial_state, self.maximizer)
+        # self.ai_move = self.minimax(self.initial_state, self.maximizer)
         #
         print(f'Minimax done!')
         print(f'maximum depth: {self.depth_max}')
@@ -90,122 +88,136 @@ class Minimax:
     # -----------------------------------------------------------------------------    
     # Perform minimax algorithm for AI: with Alpha-Beta Prunning from Wikipedia
     # ----------------------------------------------------------------------------- 
-    # def minimax(self, state, alpha, beta, maximizingPlayer):
+    def minimax(self, state, alpha, beta, maximizingPlayer):
         
-    #     actions = self.find_actions(state)
-    #     depth = len(actions)
-    #     board = MMBoard(self.user_agent)
-    #     board.update(state)
+        actions = self.find_actions(state)
+        depth = len(actions)
+        board = MMBoard(self.user_agent)
+        board.update(state)
         
-    #     if depth == 0 or board.game_over:
-    #         return board.score
+        if board.game_over:
+            return board.score
     
-    #     if maximizingPlayer:
-    #         value = - math.inf
-    #         for action in actions:
-    #             child_state = self.find_child_state(state, action, maximizer=True)
-    #             value = max(value, self.minimax(child_state, alpha, beta, False))
-    #             if depth == self.depth_max:
-    #                 self.data.outcome[action] = value
-    #             if value >= beta: 
-    #                 break 
-    #             alpha = max(alpha, value)
-    #         return value
-    #     else:
-    #         value = + math.inf
-    #         for action in actions:
-    #             child_state = self.find_child_state(state, action, maximizer=False)
-    #             value = min(value, self.minimax(child_state, alpha, beta, True))
-    #             if depth == self.depth_max:
-    #                 self.data.outcome[action] = value
-    #             if value <= beta: 
-    #                 break 
-    #             beta = min(beta, value)
-    #         return value
+        if maximizingPlayer:
+            V_max = - math.inf
+            for action in actions:
+                child_state = self.find_child_state(state, action, maximizer=True)
+                value_min = self.minimax(child_state, alpha, beta, False)
+                if depth == self.depth_max:
+                    self.data.outcome[action] = value_min
+                    if value_min > V_max:
+                        optimal_action = action
+                V_max = max(V_max, value_min)
+                if V_max >= beta: # beta is inherited from the parent node.
+                    break 
+                alpha = max(alpha, V_max)
+            # Select return value.
+            if depth == self.depth_max:
+                return optimal_action
+            else:
+                return V_max
+        else:
+            V_min = + math.inf
+            for action in actions:
+                child_state = self.find_child_state(state, action, maximizer=False)
+                value_max = self.minimax(child_state, alpha, beta, True)
+                if depth == self.depth_max:
+                    self.data.outcome[action] = value_max
+                    if value_max < V_min:
+                        optimal_action = action
+                V_min = min(V_min, value_max)
+                if V_min <= alpha: 
+                    break 
+                beta = min(beta, V_min)
+            # Select return value.
+            if depth == self.depth_max:
+                return optimal_action
+            else:
+                return V_min
     
     # -----------------------------------------------------------------------------    
     # Perform minimax algorithm for AI: with Alpha-Beta Prunning: Harvard CS50 AI.
     # -----------------------------------------------------------------------------   
     # The source codes of minimax algorithm below comes from the course of CS50: AI at Havard university.
     # I kept its logic but modified some lines of the codes: variable's names and evaluation function and so on.
-    def max_value(self, state, alpha, beta):
-        """
-        Returns the maximum value for the current player on the board 
-        using alpha-beta pruning.
-        """
-        actions = self.find_actions(state)
-        board = MMBoard(self.user_agent)
-        board.update(state)
+    # def max_value(self, state, alpha, beta):
+    #     """
+    #     Returns the maximum value for the current player on the board 
+    #     using alpha-beta pruning.
+    #     """
+    #     actions = self.find_actions(state)
+    #     board = MMBoard(self.user_agent)
+    #     board.update(state)
         
-        if board.game_over:
-            return board.score
+    #     if board.game_over:
+    #         return board.score
         
-        v = -math.inf
-        for action in actions:
-            child_state = self.find_child_state(state, action, maximizer=True)
-            v = max(v, self.min_value(child_state, alpha, beta))
-            alpha = max(alpha, v)
-            if alpha >= beta:
-                break
-        return v
+    #     v = -math.inf
+    #     for action in actions:
+    #         child_state = self.find_child_state(state, action, maximizer=True)
+    #         v = max(v, self.min_value(child_state, alpha, beta))
+    #         alpha = max(alpha, v)
+    #         if alpha >= beta:
+    #             break
+    #     return v
 
-    def min_value(self, state, alpha, beta):
-        """
-        Returns the minimum value for the current player on the board 
-        using alpha-beta pruning.
-        """
-        actions = self.find_actions(state)
-        board = MMBoard(self.user_agent)
-        board.update(state)
+    # def min_value(self, state, alpha, beta):
+    #     """
+    #     Returns the minimum value for the current player on the board 
+    #     using alpha-beta pruning.
+    #     """
+    #     actions = self.find_actions(state)
+    #     board = MMBoard(self.user_agent)
+    #     board.update(state)
         
-        if board.game_over:
-            return board.score
+    #     if board.game_over:
+    #         return board.score
         
-        v = math.inf
-        for action in actions:
-            child_state = self.find_child_state(state, action, maximizer=False)
-            v = min(v, self.max_value(child_state, alpha, beta))
-            beta = min(beta, v)
-            if alpha >= beta:
-                break
-        return v
+    #     v = math.inf
+    #     for action in actions:
+    #         child_state = self.find_child_state(state, action, maximizer=False)
+    #         v = min(v, self.max_value(child_state, alpha, beta))
+    #         beta = min(beta, v)
+    #         if alpha >= beta:
+    #             break
+    #     return v
 
-    def minimax(self, state, maximizer):
-        """
-        Returns the optimal action for the current player on the board 
-        using the minimax algorithm with alpha-beta pruning.
-        """
-        actions = self.find_actions(state)
-        board = MMBoard(self.user_agent)
-        board.update(state)
-        depth = len(actions)
+    # def minimax(self, state, maximizer):
+    #     """
+    #     Returns the optimal action for the current player on the board 
+    #     using the minimax algorithm with alpha-beta pruning.
+    #     """
+    #     actions = self.find_actions(state)
+    #     board = MMBoard(self.user_agent)
+    #     board.update(state)
+    #     depth = len(actions)
         
-        if board.game_over:
-            return None
+    #     if board.game_over:
+    #         return None
 
-        if maximizer:
-            v = -math.inf
-            optimal_action = None
-            for action in actions:
-                child_state = self.find_child_state(state, action, maximizer=True)
-                new_value = self.min_value(child_state, -math.inf, math.inf)
-                if depth == self.depth_max:
-                    self.data.outcome[action] = new_value
-                if new_value > v:
-                    v = new_value
-                    optimal_action = action
-            return optimal_action
+    #     if maximizer:
+    #         v = -math.inf
+    #         optimal_action = None
+    #         for action in actions:
+    #             child_state = self.find_child_state(state, action, maximizer=True)
+    #             new_value = self.min_value(child_state, -math.inf, math.inf)
+    #             if depth == self.depth_max:
+    #                 self.data.outcome[action] = new_value
+    #             if new_value > v:
+    #                 v = new_value
+    #                 optimal_action = action
+    #         return optimal_action
         
-        else:
-            v = math.inf
-            optimal_action = None
-            for action in actions:
-                child_state = self.find_child_state(state, action, maximizer=False)
-                new_value = self.max_value(child_state, -math.inf, math.inf)
-                if depth == self.depth_max:
-                    self.data.outcome[action] = new_value
-                if new_value < v:
-                    v = new_value
-                    optimal_action = action
-            return optimal_action
+    #     else:
+    #         v = math.inf
+    #         optimal_action = None
+    #         for action in actions:
+    #             child_state = self.find_child_state(state, action, maximizer=False)
+    #             new_value = self.max_value(child_state, -math.inf, math.inf)
+    #             if depth == self.depth_max:
+    #                 self.data.outcome[action] = new_value
+    #             if new_value < v:
+    #                 v = new_value
+    #                 optimal_action = action
+    #         return optimal_action
     

@@ -45,6 +45,7 @@ class ModelMinimax:
         # - Pseudo Code for Minimax Algorithm 1: With Alpha-Beta Pruning
         # ----------------------------------------------------------------  
         # Warning: This algorithm found in Wikipedia doesn't work properly.
+        # << Bugs corrected!
         # 
         # function alphabeta(node, depth, α, β, maximizingPlayer) is
         #     if depth == 0 or node is terminal then
